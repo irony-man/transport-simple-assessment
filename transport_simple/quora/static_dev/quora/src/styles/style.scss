@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@200;300;400;500;600;700&display=swap');
+
+
+$primary: #a82723;
+$secondary:#0050a8;
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+body {
+  @extend .bg-body-tertiary;
+}
+
+a {
+  text-decoration: none;
+  &:hover {
+    color: $primary;
+  }
+}
+
+.max-w-400 {
+  max-width: 400px !important;
+  margin: auto;
+}
+
+.small-container {
+  @extend .container;
+  max-width: 720px !important;
+  margin: auto;
+}
