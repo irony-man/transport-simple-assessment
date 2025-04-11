@@ -46,58 +46,52 @@ export default function QuestionList({ query = {} }) {
           <SmallLoader />
         </div>
       }
-      endMessage={
-        loading ? (
-          <></>
-        ) : (
-          <h5 className="mt-5 text-center">
-            That&apos;s all we have for you!!
-          </h5>
-        )
-      }
     >
       <div>
-        {loading && page === 1
-          ? Array(6)
-              .fill()
-              .map((_, idx) => (
-                <div key={idx} className="mb-4 card">
-                  <div className="card-body">
-                    <h5 className="card-title placeholder-glow">
-                      <span className="placeholder w-100"></span>
-                    </h5>
-                    <div className="card-text small d-flex justify-content-between placeholder-glow">
-                      <span className="placeholder col-3"></span>
-                      <span className="placeholder col-3"></span>
-                      <span className="placeholder col-3"></span>
-                    </div>
-                  </div>
-                </div>
-              ))
-          : questions.map((question) => (
-              <Link
-                key={question.uid}
-                className="mb-4 card"
-                to={`/${question.uid}`}
-              >
+        {loading && page === 1 ? (
+          Array(6)
+            .fill()
+            .map((_, idx) => (
+              <div key={idx} className="mb-4 card">
                 <div className="card-body">
-                  <h6 className="card-title">{question.title}</h6>
-
-                  <div className="d-flex justify-content-between">
-                    <small className="text-muted">
-                      Asked by: <strong>{question.username}</strong>
-                    </small>
-                    <small className="text-muted">
-                      Asked:{" "}
-                      <strong>{dayjs(question.created).fromNow()}</strong>
-                    </small>
-                    <small className="text-muted">
-                      Answers: <strong>{question.answer_count}</strong>
-                    </small>
+                  <h5 className="card-title placeholder-glow">
+                    <span className="placeholder w-100"></span>
+                  </h5>
+                  <div className="card-text small d-flex justify-content-between placeholder-glow">
+                    <span className="placeholder col-3"></span>
+                    <span className="placeholder col-3"></span>
+                    <span className="placeholder col-3"></span>
                   </div>
                 </div>
-              </Link>
-            ))}
+              </div>
+            ))
+        ) : questions.length === 0 ? (
+          <div className="display-6 text-center">No Questions Yet</div>
+        ) : (
+          questions.map((question) => (
+            <Link
+              key={question.uid}
+              className="mb-4 card"
+              to={`/${question.uid}`}
+            >
+              <div className="card-body">
+                <h6 className="card-title">{question.title}</h6>
+
+                <div className="d-flex justify-content-between">
+                  <small className="text-muted">
+                    Asked by: <strong>{question.username}</strong>
+                  </small>
+                  <small className="text-muted">
+                    Asked: <strong>{dayjs(question.created).fromNow()}</strong>
+                  </small>
+                  <small className="text-muted">
+                    Answers: <strong>{question.answer_count}</strong>
+                  </small>
+                </div>
+              </div>
+            </Link>
+          ))
+        )}
       </div>
     </InfiniteScroll>
   );

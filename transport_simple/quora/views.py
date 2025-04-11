@@ -4,13 +4,13 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from quora.filters import AnswerFilter, QuestionFilter
 from quora.forms import LoginForm, SignupForm
 from quora.mixins import AuthMixin
 from quora.models import Answer, Question
 from quora.serializers import (
     AnswerReactionSerializer,
     AnswerSerializer,
-    ListAnswerSerializer,
     ListQuestionSerializer,
     QuestionSerializer,
 )
@@ -85,6 +85,7 @@ class LogoutView(AuthMixin, TemplateView):
 
 class QuestionViewSet(AuthMixin, ModelViewSet):
     serializer_class = QuestionSerializer
+    filterset_class = QuestionFilter
 
     def get_serializer_class(self):
         if self.request.method.upper() == "GET" and not self.kwargs.get("pk"):
@@ -100,14 +101,9 @@ class QuestionViewSet(AuthMixin, ModelViewSet):
 
 class AnswerViewSet(AuthMixin, ModelViewSet):
     serializer_class = AnswerSerializer
+    filterset_class = AnswerFilter
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ["question"]
     ordering_fields = ["created", "interaction"]
-
-    def get_serializer_class(self):
-        if self.request.method.upper() == "GET" and not self.kwargs.get("pk"):
-            return ListAnswerSerializer
-        return super(AnswerViewSet, self).get_serializer_class()
 
     def get_queryset(self):
         return Answer.objects.all().annotate(

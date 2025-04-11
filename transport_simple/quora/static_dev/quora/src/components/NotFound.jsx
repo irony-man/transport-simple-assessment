@@ -1,6 +1,6 @@
 import Helmet from "react-helmet";
 
-const NotFound = (prop) => {
+const NotFound = () => {
   return (
     <>
     <Helmet>
@@ -8,7 +8,7 @@ const NotFound = (prop) => {
     </Helmet>
       <div className="container text-center">
         <h1>404</h1>
-        <h5>{prop.type || "Page"} not found</h5>
+        <h5>Page not found</h5>
       </div>
     </>
   );

@@ -22,6 +22,16 @@ export default function Navbar() {
           <div id="navbar" className="collapse navbar-collapse">
             <ul className="navbar-nav align-items-center gap-3 ms-auto mb-2 mb-lg-0 mt-4 mt-md-0">
               <li className="nav-item">
+                <Link className="fw-medium" to="/your-questions">
+                  Your Questions
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="fw-medium" to="/your-answers">
+                  Your Answers
+                </Link>
+              </li>
+              <li className="nav-item">
                 <Link className="btn btn-outline-primary" to="/new">
                   Ask Question
                 </Link>

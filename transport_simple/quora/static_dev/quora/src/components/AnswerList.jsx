@@ -10,12 +10,12 @@ import ExpandableMarkdown from "@/components/ExpandableMarkdown";
 
 dayjs.extend(relativeTime);
 
-export default function AnswerList({ query = {} }) {
+export default function AnswerList({ query = {}, questionSummary = false }) {
   const [answers, setAnswers] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
-  const limit = 5;
+  const limit = 9;
 
   useEffect(() => {
     async function initiate() {
@@ -103,14 +103,13 @@ export default function AnswerList({ query = {} }) {
         ) : answers.length === 0 ? (
           <div className="display-6">No Answers Yet</div>
         ) : (
-          answers.map((answer) => (
+          answers.map(({ question, ...answer }) => (
             <div key={answer.uid} className="mb-4 card">
-              <div className="card-header small">
-                <strong>{answer.username}</strong>
-                <span className="mx-1">&#183;</span>
-                {dayjs(answer.created).fromNow()}
-              </div>
               <div className="card-body">
+                {questionSummary && <div className="h5 mb-3">
+                  <Link to={`/${question.uid}`}>{question.title}</Link>
+                </div>}
+
                 {answer.title && (
                   <h6 className="card-title">{answer.title}</h6>
                 )}
@@ -137,24 +136,31 @@ export default function AnswerList({ query = {} }) {
                     {answer.upvote_count}
                   </button>
 
-                  {!answer.is_yours && <button
-                    type="button"
-                    className={`btn ${
-                      answer.is_downvoted
-                        ? "btn-primary"
-                        : "btn-outline-primary"
-                    }`}
-                    disabled={answer.is_yours}
-                    onClick={() =>
-                      handleReaction(
-                        answer.is_downvoted ? "remove" : "downvote",
-                        answer.uid
-                      )
-                    }
-                  >
-                    <i className="fa-solid fa-arrow-down"></i>
-                  </button>}
+                  {!answer.is_yours && (
+                    <button
+                      type="button"
+                      className={`btn ${
+                        answer.is_downvoted
+                          ? "btn-primary"
+                          : "btn-outline-primary"
+                      }`}
+                      disabled={answer.is_yours}
+                      onClick={() =>
+                        handleReaction(
+                          answer.is_downvoted ? "remove" : "downvote",
+                          answer.uid
+                        )
+                      }
+                    >
+                      <i className="fa-solid fa-arrow-down"></i>
+                    </button>
+                  )}
                 </div>
+              </div>
+              <div className="card-footer small">
+                <strong>{answer.username}</strong>
+                <span className="mx-1">&#183;</span>
+                {dayjs(answer.created).fromNow()}
               </div>
             </div>
           ))
