@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -79,6 +80,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "transport_simple.wsgi.application"
+ASGI_APPLICATION = "transport_simple.asgi.application"
 
 
 # Database
@@ -140,6 +142,13 @@ STRFTIME_DATETIME_FORMAT = f"{STRFTIME_DATE_FORMAT} {STRFTIME_TIME_FORMAT}"
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR.joinpath("static")
+STATICFILES_FINDERS = (
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    # Keep this disabled as this can interfere with django-storages
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
+
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "global_static"),)
 
 
@@ -185,3 +194,10 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "PAGE_SIZE": 50,
 }
+
+
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    STATICFILES_STORAGE = (
+        "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    )
