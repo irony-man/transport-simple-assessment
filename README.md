@@ -2,7 +2,7 @@
 Tools and packages required to successfully install this project.
 * Linux
 * Python 3.13
-* Postgres 14
+* Node 20.14.0
 
 ## Local Run Setup
 Clone the repo and run the following commands:
@@ -23,6 +23,11 @@ cat .env.template > .env
 ```
 Add your variables to .env file
 
+### Go to folder
+```
+cd transport_simple
+```
+
 ### Make migrations and migrate
 ```
 python manage.py makemigrations
@@ -34,7 +39,26 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-### Run the server
+## Set Up Front-end
+### Go to front-end folder
+```
+cd quora/static_dev/quora
+```
+
+### Install packages
+```
+npm i --legacy-peer-deps
+```
+### Run Build
+```
+npm run build
+```
+### Come back to Django directory
+```
+cd ../../../
+```
+
+## Run the server
 ```
 python manage.py runserver
 ```
