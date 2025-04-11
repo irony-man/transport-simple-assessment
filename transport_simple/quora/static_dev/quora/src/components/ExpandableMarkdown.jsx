@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Markdown from "react-markdown";
 
 export default function ExpandableMarkdown({
-  text,
+  text="",
   initialLength = 300,
   expanded = false,
 }) {

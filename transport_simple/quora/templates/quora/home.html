@@ -1,24 +1,6 @@
-{% load static vite_tags %}
+{% extends 'quora/base.html' %}
+{% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
-
-    {% vite_css_standalone 'src/styles/style.scss' %}
-    <title>
-      Quora
-    </title>
-  </head>
-  <body data-bs-theme="light">
-    {% csrf_token %}
-
-    <div id="root"></div>
-    {% vite_js "src/main.jsx" %}
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-  </body>
-
-</html>
+{% block content %}
+  <div id="root"></div>
+{% endblock content %}

@@ -1,9 +1,9 @@
-import QuestionsList from "@/components/QuestionsList";
+import QuestionList from "@/components/QuestionList";
 
 const Home = () => {
   return (
     <div className="container">
-      <QuestionsList />
+      <QuestionList />
     </div>
   );
 };

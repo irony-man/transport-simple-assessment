@@ -54,7 +54,7 @@ class LiteUserSerializer(ModelSerializer):
         ]
 
 
-class LiteQuestionSerializer(ModelSerializer):
+class ListQuestionSerializer(ModelSerializer):
     username = CharField(source="user.username", read_only=True)
 
     class Meta:
@@ -74,6 +74,7 @@ class LiteQuestionSerializer(ModelSerializer):
 
 class QuestionSerializer(ModelSerializer):
     username = CharField(source="user.username", read_only=True)
+    is_yours = SerializerMethodField()
 
     class Meta:
         model = Question
@@ -83,6 +84,7 @@ class QuestionSerializer(ModelSerializer):
             "description",
             "answer_count",
             "username",
+            "is_yours",
             "created",
             "updated",
         ]
@@ -92,11 +94,18 @@ class QuestionSerializer(ModelSerializer):
             "updated",
         ]
 
+    def get_is_yours(self, instance: Question):
+        if user := self.context.get("request").user:
+            if user.is_authenticated:
+                return instance.user == user
+        return False
 
-class AnswerSerializer(ModelSerializer):
+
+class ListAnswerSerializer(ModelSerializer):
     username = CharField(source="user.username", read_only=True)
     is_upvoted = SerializerMethodField()
     is_downvoted = SerializerMethodField()
+    is_yours = SerializerMethodField()
 
     class Meta:
         model = Answer
@@ -108,6 +117,7 @@ class AnswerSerializer(ModelSerializer):
             "downvote_count",
             "is_upvoted",
             "is_downvoted",
+            "is_yours",
             "username",
             "created",
             "updated",
@@ -118,37 +128,98 @@ class AnswerSerializer(ModelSerializer):
             "updated",
         ]
 
-    def get_is_upvoted(self, instance):
+    def get_is_upvoted(self, instance: Answer):
         if user := self.context.get("request").user:
-            if user.is_authenticated:
-                return instance.answerreaction_set.filter(
-                    user=user, reaction_type=AnswerReactionType.UPVOAT
-                ).exists()
+            return instance.answerreaction_set.filter(
+                user=user, reaction_type=AnswerReactionType.UPVOTE
+            ).exists()
         return False
 
-    def get_is_downvoted(self, instance):
+    def get_is_downvoted(self, instance: Answer):
         if user := self.context.get("request").user:
-            if user.is_authenticated:
-                return instance.answerreaction_set.filter(
-                    user=user, reaction_type=AnswerReactionType.DOWNVOAT
-                ).exists()
+            return instance.answerreaction_set.filter(
+                user=user, reaction_type=AnswerReactionType.DOWNVOTE
+            ).exists()
         return False
+
+    def get_is_yours(self, instance: Answer):
+        if user := self.context.get("request").user:
+            return instance.user == user
+        return False
+
+
+class AnswerSerializer(ModelSerializer):
+    username = CharField(source="user.username", read_only=True)
+    user = LiteUserSerializer(read_only=True)
+    is_upvoted = SerializerMethodField()
+    is_downvoted = SerializerMethodField()
+    is_yours = SerializerMethodField()
+    question = SerializedRelationField(
+        lookup_key="uid",
+        queryset=Question.objects,
+        repr_serializer=ListQuestionSerializer,
+    )
+
+    class Meta:
+        model = Answer
+        fields = [
+            "uid",
+            "title",
+            "description",
+            "question",
+            "upvote_count",
+            "downvote_count",
+            "is_upvoted",
+            "is_downvoted",
+            "is_yours",
+            "username",
+            "user",
+            "created",
+            "updated",
+        ]
+        read_only_fields = [
+            "uid",
+            "created",
+            "updated",
+        ]
+
+    def get_is_upvoted(self, instance: Answer):
+        if user := self.context.get("request").user:
+            return instance.answerreaction_set.filter(
+                user=user, reaction_type=AnswerReactionType.UPVOTE
+            ).exists()
+        return False
+
+    def get_is_downvoted(self, instance: Answer):
+        if user := self.context.get("request").user:
+            return instance.answerreaction_set.filter(
+                user=user, reaction_type=AnswerReactionType.DOWNVOTE
+            ).exists()
+        return False
+
+    def get_is_yours(self, instance: Answer):
+        if user := self.context.get("request").user:
+            return instance.user == user
+        return False
+
+    def validate(self, attrs):
+        if "user" not in attrs and (user := self.context.get("request").user):
+            attrs["user"] = user
+        instance = Answer(**attrs)
+        instance.clean()
+        return super(AnswerSerializer, self).validate(attrs)
 
 
 class AnswerReactionSerializer(ModelSerializer):
-    username = CharField(source="user.username", read_only=True)
-    answer = SerializedRelationField(
-        lookup_key="uid",
-        queryset=Answer.objects.all(),
-        repr_serializer=AnswerSerializer,
-    )
+    user = LiteUserSerializer(read_only=True)
+    answer = SerializedRelationField("uid", Answer.objects, AnswerReaction)
 
     class Meta:
         model = AnswerReaction
         fields = [
             "uid",
             "answer",
-            "username",
+            "user",
             "reaction_type",
             "reaction_type_display",
             "created",
@@ -159,3 +230,10 @@ class AnswerReactionSerializer(ModelSerializer):
             "created",
             "updated",
         ]
+
+    def validate(self, attrs):
+        if "user" not in attrs and (user := self.context.get("request").user):
+            attrs["user"] = user
+        instance = AnswerReaction(**attrs)
+        instance.clean()
+        return super(AnswerReactionSerializer, self).validate(attrs)

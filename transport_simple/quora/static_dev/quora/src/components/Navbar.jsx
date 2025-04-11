@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
+  const isLogged = localStorage.getItem('isLogged') === 'true';
+
   return (
     <div className="bg-white border-bottom shadow-sm mb-5">
       <nav className="container navbar navbar-expand-lg">
@@ -18,16 +20,16 @@ export default function Navbar() {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div id="navbar" className="collapse navbar-collapse">
-            <ul className="navbar-nav gap-3 ms-auto mb-2 mb-lg-0 mt-4 mt-md-0">
+            <ul className="navbar-nav align-items-center gap-3 ms-auto mb-2 mb-lg-0 mt-4 mt-md-0">
               <li className="nav-item">
-                <Link className="btn btn-outline-primary" to="/login">
-                  Login
+                <Link className="btn btn-outline-primary" to="/new">
+                  Ask Question
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="btn btn-primary" to="/signup">
-                  Sign Up
-                </Link>
+                <a className="btn btn-primary" href="/logout/">
+                  Logout
+                </a>
               </li>
             </ul>
           </div>

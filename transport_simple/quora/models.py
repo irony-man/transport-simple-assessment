@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db.models import (
     CASCADE,
     CharField,
@@ -52,23 +53,23 @@ class Answer(CreateUpdate):
     @property
     def upvote_count(self):
         return self.answerreaction_set.filter(
-            reaction_type=AnswerReactionType.UPVOAT
+            reaction_type=AnswerReactionType.UPVOTE
         ).count()
 
     @property
     def downvote_count(self):
         return self.answerreaction_set.filter(
-            reaction_type=AnswerReactionType.DOWNVOAT
+            reaction_type=AnswerReactionType.DOWNVOTE
         ).count()
 
     def upvote(self, user):
         reaction, created = AnswerReaction.objects.get_or_create(
             answer=self,
             user=user,
-            defaults={"reaction_type": AnswerReactionType.UPVOAT},
+            defaults={"reaction_type": AnswerReactionType.UPVOTE},
         )
         if not created:
-            reaction.reaction_type = AnswerReactionType.UPVOAT
+            reaction.reaction_type = AnswerReactionType.UPVOTE
             reaction.save()
         return reaction
 
@@ -76,15 +77,22 @@ class Answer(CreateUpdate):
         reaction, created = AnswerReaction.objects.get_or_create(
             answer=self,
             user=user,
-            defaults={"reaction_type": AnswerReactionType.DOWNVOAT},
+            defaults={"reaction_type": AnswerReactionType.DOWNVOTE},
         )
         if not created:
-            reaction.reaction_type = AnswerReactionType.DOWNVOAT
+            reaction.reaction_type = AnswerReactionType.DOWNVOTE
             reaction.save()
         return reaction
 
     def __str__(self):
-        return f"{self.description} / {self.question.title}"
+        return f"{self.title} / {self.question.title}"
+
+    def clean(self):
+        if self.user == self.question.user:
+            raise ValidationError(
+                {"user": "You cannot answer your own question."}
+            )
+        return super(Answer, self).clean()
 
 
 class AnswerReaction(CreateUpdate):
@@ -93,7 +101,7 @@ class AnswerReaction(CreateUpdate):
     reaction_type = CharField(
         max_length=255,
         choices=AnswerReactionType.choices,
-        default=AnswerReactionType.UPVOAT,
+        default=AnswerReactionType.UPVOTE,
     )
 
     class Meta:
@@ -105,3 +113,10 @@ class AnswerReaction(CreateUpdate):
 
     def __str__(self):
         return f"{self.user} / {self.answer} / {self.reaction_type}"
+
+    def clean(self):
+        if self.user == self.answer.user:
+            raise ValidationError(
+                {"user": "You cannot react to your own answer."}
+            )
+        return super(AnswerReaction, self).clean()

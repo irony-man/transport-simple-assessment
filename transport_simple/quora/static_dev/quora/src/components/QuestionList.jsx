@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
-// import DesignLoading from "./DesignLoading";
-import Loader from "@/components/Loader";
+import SmallLoader from "@/components/SmallLoader";
 import apis from "@/apis";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
-const QuestionsList = ({ query = {}, heading = "" }) => {
-  const navigate = useNavigate();
+export default function QuestionList({ query = {} }) {
   const [questions, setQuestions] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -44,8 +42,8 @@ const QuestionsList = ({ query = {}, heading = "" }) => {
       next={() => setPage(page + 1)}
       hasMore={hasMore}
       loader={
-        <div className="text-center mt-5">
-          <Loader />
+        <div className="text-center">
+          <SmallLoader />
         </div>
       }
       endMessage={
@@ -59,12 +57,21 @@ const QuestionsList = ({ query = {}, heading = "" }) => {
       }
     >
       <div>
-        {loading
+        {loading && page === 1
           ? Array(6)
               .fill()
               .map((_, idx) => (
-                <div key={idx} className="col-xl-4 col-lg-4 col-md-6 col-12">
-                  {/* <DesignLoading /> */}
+                <div key={idx} className="mb-4 card">
+                  <div className="card-body">
+                    <h5 className="card-title placeholder-glow">
+                      <span className="placeholder w-100"></span>
+                    </h5>
+                    <div className="card-text small d-flex justify-content-between placeholder-glow">
+                      <span className="placeholder col-3"></span>
+                      <span className="placeholder col-3"></span>
+                      <span className="placeholder col-3"></span>
+                    </div>
+                  </div>
                 </div>
               ))
           : questions.map((question) => (
@@ -78,16 +85,14 @@ const QuestionsList = ({ query = {}, heading = "" }) => {
 
                   <div className="d-flex justify-content-between">
                     <small className="text-muted">
-                      Asked by:{" "}
-                      <strong>{question.username}</strong>
+                      Asked by: <strong>{question.username}</strong>
                     </small>
                     <small className="text-muted">
                       Asked:{" "}
                       <strong>{dayjs(question.created).fromNow()}</strong>
                     </small>
                     <small className="text-muted">
-                      Answers:{" "}
-                      <strong>{question.answer_count}</strong>
+                      Answers: <strong>{question.answer_count}</strong>
                     </small>
                   </div>
                 </div>
@@ -96,6 +101,4 @@ const QuestionsList = ({ query = {}, heading = "" }) => {
       </div>
     </InfiniteScroll>
   );
-};
-
-export default QuestionsList;
+}

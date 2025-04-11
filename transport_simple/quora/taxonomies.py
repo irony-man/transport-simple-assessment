@@ -11,5 +11,5 @@ def serialize(klass) -> List[Dict[str, Any]]:
 
 
 class AnswerReactionType(TextChoices):
-    UPVOAT = "UPVOAT", "Upvote"
-    DOWNVOAT = "DOWNVOAT", "Downvote"
+    UPVOTE = "UPVOTE", "Upvote"
+    DOWNVOTE = "DOWNVOTE", "Downvote"

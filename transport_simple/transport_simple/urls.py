@@ -18,11 +18,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path, re_path
 from quora.urls import router
-from quora.views import HomePageView, LoginAPIView
 
 urlpatterns = [
     path("quora-adm/", admin.site.urls),
     re_path(r"api/v1/", include(router.urls)),
-    path("api/v1/login/", LoginAPIView.as_view(), name="login"),
-    re_path(r"^", HomePageView.as_view(), name="home"),
+    re_path(
+        r"",
+        include(
+            ("quora.urls", "quora"),
+            namespace="quora",
+        ),
+    ),
 ]
